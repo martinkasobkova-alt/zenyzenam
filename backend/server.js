@@ -3,6 +3,7 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
+const { Resend } = require('resend');
 require('dotenv').config();
 
 const app = express();
@@ -11,6 +12,9 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Resend email client
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Database connection
 const pool = new Pool({
@@ -85,6 +89,18 @@ async function initializeDatabase() {
           to_user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
           message TEXT NOT NULL,
           read BOOLEAN DEFAULT FALSE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+      
+      // Create password reset table
+      await pool.query(`
+        CREATE TABLE password_resets (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+          reset_code VARCHAR(6) NOT NULL,
+          expires_at TIMESTAMP NOT NULL,
+          used BOOLEAN DEFAULT FALSE,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
       `);
@@ -260,6 +276,43 @@ app.post('/api/register', async (req, res) => {
     // Generate token
     const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
 
+    // Send welcome email
+    try {
+      await resend.emails.send({
+        from: 'Ženy Ženám <onboarding@resend.dev>',
+        to: email,
+        subject: '🎉 Vítej v komunitě Ženy Ženám!',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #f5576c;">💜 Vítej, ${name}!</h1>
+            <p>Jsme rádi, že ses připojila ke komunitě Ženy Ženám!</p>
+            <p><strong>Tvůj profil:</strong></p>
+            <ul>
+              <li>📍 Město: ${city}</li>
+              <li>✅ Nabízíš: ${servicesOffered ? servicesOffered.length : 0} služeb</li>
+              <li>🔍 Hledáš: ${servicesNeeded ? servicesNeeded.length : 0} služeb</li>
+            </ul>
+            <p><strong>Co dělat dál?</strong></p>
+            <ol>
+              <li>Přihlas se do aplikace</li>
+              <li>Hledej ženy ve tvém městě</li>
+              <li>Kontaktuj je a domluvte se!</li>
+            </ol>
+            <p style="color: #856404; background: #fff3cd; padding: 15px; border-radius: 5px;">
+              ⚠️ <strong>Bezpečnostní pokyny:</strong><br>
+              • Setkávejte se vždy na veřejných místech<br>
+              • Informujte blízkou osobu o setkání<br>
+              • Důvěřujte svému instinktu
+            </p>
+            <p>Hodně štěstí!<br>Tým Ženy Ženám</p>
+          </div>
+        `
+      });
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError);
+      // Don't fail registration if email fails
+    }
+
     res.status(201).json({ user, token });
   } catch (error) {
     console.error('Error registering user:', error);
@@ -318,6 +371,116 @@ app.post('/api/login', async (req, res) => {
   } catch (error) {
     console.error('Error logging in:', error);
     res.status(500).json({ error: 'Failed to login' });
+  }
+});
+
+// Request password reset
+app.post('/api/password-reset/request', async (req, res) => {
+  const { email } = req.body;
+  
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+  
+  try {
+    const userResult = await pool.query('SELECT id, name FROM users WHERE email = $1', [email]);
+    
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Email not found' });
+    }
+    
+    const user = userResult.rows[0];
+    
+    // Generate 6-digit code
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+    
+    await pool.query(
+      'INSERT INTO password_resets (user_id, reset_code, expires_at) VALUES ($1, $2, $3)',
+      [user.id, resetCode, expiresAt]
+    );
+    
+    // Send reset code via email
+    try {
+      await resend.emails.send({
+        from: 'Ženy Ženám <onboarding@resend.dev>',
+        to: email,
+        subject: '🔐 Reset hesla - Ženy Ženám',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #f5576c;">🔐 Reset hesla</h1>
+            <p>Ahoj ${user.name},</p>
+            <p>Požádala jsi o reset hesla. Tvůj reset kód je:</p>
+            <div style="background: #f8f9fa; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;">
+              ${resetCode}
+            </div>
+            <p>Tento kód je platný <strong>15 minut</strong>.</p>
+            <p>Pokud jsi o reset hesla nežádala, ignoruj tento email.</p>
+            <p>Tým Ženy Ženám</p>
+          </div>
+        `
+      });
+      
+      res.json({ 
+        message: 'Reset kód byl odeslán na tvůj email',
+        email: email
+      });
+    } catch (emailError) {
+      console.error('Failed to send reset email:', emailError);
+      // Fallback: return code directly if email fails
+      res.json({ 
+        message: 'Reset code generated',
+        resetCode: resetCode,
+        email: email
+      });
+    }
+  } catch (error) {
+    console.error('Error requesting password reset:', error);
+    res.status(500).json({ error: 'Failed to request password reset' });
+  }
+});
+
+// Reset password with code
+app.post('/api/password-reset/confirm', async (req, res) => {
+  const { email, resetCode, newPassword } = req.body;
+  
+  if (!email || !resetCode || !newPassword) {
+    return res.status(400).json({ error: 'Email, reset code, and new password are required' });
+  }
+  
+  if (newPassword.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters' });
+  }
+  
+  try {
+    const userResult = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Email not found' });
+    }
+    
+    const userId = userResult.rows[0].id;
+    
+    const resetResult = await pool.query(
+      `SELECT * FROM password_resets 
+       WHERE user_id = $1 AND reset_code = $2 AND used = FALSE AND expires_at > NOW()
+       ORDER BY created_at DESC LIMIT 1`,
+      [userId, resetCode]
+    );
+    
+    if (resetResult.rows.length === 0) {
+      return res.status(400).json({ error: 'Invalid or expired reset code' });
+    }
+    
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    
+    await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [passwordHash, userId]);
+    await pool.query('UPDATE password_resets SET used = TRUE WHERE id = $1', [resetResult.rows[0].id]);
+    
+    res.json({ message: 'Password reset successfully' });
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    res.status(500).json({ error: 'Failed to reset password' });
   }
 });
 
@@ -508,10 +671,62 @@ app.post('/api/messages', authenticateToken, async (req, res) => {
   }
 
   try {
+    // Get sender and recipient info
+    const senderResult = await pool.query(
+      'SELECT name, email FROM users WHERE id = $1',
+      [req.user.id]
+    );
+    
+    const recipientResult = await pool.query(
+      'SELECT name, email FROM users WHERE id = $1',
+      [toUserId]
+    );
+    
+    if (recipientResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Recipient not found' });
+    }
+    
+    const sender = senderResult.rows[0];
+    const recipient = recipientResult.rows[0];
+    
     const result = await pool.query(
       'INSERT INTO messages (from_user_id, to_user_id, message) VALUES ($1, $2, $3) RETURNING *',
       [req.user.id, toUserId, message]
     );
+
+    // Send email notification to recipient
+    try {
+      await resend.emails.send({
+        from: 'Ženy Ženám <onboarding@resend.dev>',
+        to: recipient.email,
+        subject: `💬 ${sender.name} ti poslala zprávu!`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #f5576c;">💬 Nová zpráva!</h1>
+            <p>Ahoj ${recipient.name},</p>
+            <p><strong>${sender.name}</strong> ti poslala zprávu:</p>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
+              "${message}"
+            </div>
+            <p><strong>Odpověz jí:</strong></p>
+            <ul>
+              <li>📧 Email: ${sender.email}</li>
+              <li>💬 Nebo se přihlas do aplikace a odpověz tam</li>
+            </ul>
+            <p style="color: #856404; background: #fff3cd; padding: 15px; border-radius: 5px;">
+              ⚠️ <strong>Bezpečnostní pokyny:</strong><br>
+              • Setkávejte se vždy na veřejných místech<br>
+              • Informujte blízkou osobu o setkání<br>
+              • Důvěřujte svému instinktu
+            </p>
+            <p>Tým Ženy Ženám</p>
+          </div>
+        `
+      });
+    } catch (emailError) {
+      console.error('Failed to send message notification email:', emailError);
+      // Don't fail message sending if email fails
+    }
 
     res.status(201).json(result.rows[0]);
   } catch (error) {
