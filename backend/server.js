@@ -43,6 +43,7 @@ async function initializeDatabase() {
           password_hash VARCHAR(255) NOT NULL,
           city VARCHAR(100) NOT NULL,
           bio TEXT,
+          avatar VARCHAR(50) DEFAULT 'avatar1',
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
       `);
@@ -212,7 +213,7 @@ app.delete('/api/services/:id', async (req, res) => {
 
 // Register new user
 app.post('/api/register', async (req, res) => {
-  const { name, email, password, city, bio, servicesOffered, servicesNeeded } = req.body;
+  const { name, email, password, city, bio, avatar, servicesOffered, servicesNeeded } = req.body;
 
   if (!name || !email || !password || !city) {
     return res.status(400).json({ error: 'Name, email, password, and city are required' });
@@ -230,8 +231,8 @@ app.post('/api/register', async (req, res) => {
 
     // Create user
     const userResult = await pool.query(
-      'INSERT INTO users (name, email, password_hash, city, bio) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, city, bio, created_at',
-      [name, email, passwordHash, city, bio || null]
+      'INSERT INTO users (name, email, password_hash, city, bio, avatar) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, name, email, city, bio, avatar, created_at',
+      [name, email, passwordHash, city, bio || null, avatar || 'avatar1']
     );
 
     const user = userResult.rows[0];
@@ -276,7 +277,7 @@ app.post('/api/login', async (req, res) => {
 
   try {
     const result = await pool.query(
-      'SELECT id, name, email, password_hash, city, bio FROM users WHERE email = $1',
+      'SELECT id, name, email, password_hash, city, bio, avatar FROM users WHERE email = $1',
       [email]
     );
 
@@ -324,7 +325,7 @@ app.post('/api/login', async (req, res) => {
 app.get('/api/profile', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT id, name, email, city, bio, created_at FROM users WHERE id = $1',
+      'SELECT id, name, email, city, bio, avatar, created_at FROM users WHERE id = $1',
       [req.user.id]
     );
 
@@ -403,6 +404,40 @@ app.delete('/api/profile', authenticateToken, async (req, res) => {
   }
 });
 
+// Update user city
+app.put('/api/profile/city', authenticateToken, async (req, res) => {
+  const { city } = req.body;
+  
+  if (!city) {
+    return res.status(400).json({ error: 'City is required' });
+  }
+  
+  try {
+    await pool.query('UPDATE users SET city = $1 WHERE id = $2', [city, req.user.id]);
+    res.json({ message: 'City updated successfully' });
+  } catch (error) {
+    console.error('Error updating city:', error);
+    res.status(500).json({ error: 'Failed to update city' });
+  }
+});
+
+// Update user avatar
+app.put('/api/profile/avatar', authenticateToken, async (req, res) => {
+  const { avatar } = req.body;
+  
+  if (!avatar) {
+    return res.status(400).json({ error: 'Avatar is required' });
+  }
+  
+  try {
+    await pool.query('UPDATE users SET avatar = $1 WHERE id = $2', [avatar, req.user.id]);
+    res.json({ message: 'Avatar updated successfully' });
+  } catch (error) {
+    console.error('Error updating avatar:', error);
+    res.status(500).json({ error: 'Failed to update avatar' });
+  }
+});
+
 // Search for users in same city with matching services
 app.get('/api/search', authenticateToken, async (req, res) => {
   try {
@@ -431,7 +466,7 @@ app.get('/api/search', authenticateToken, async (req, res) => {
 
     // Find users in same city who offer services that current user needs
     const matches = await pool.query(
-      `SELECT DISTINCT u.id, u.name, u.email, u.city, u.bio
+      `SELECT DISTINCT u.id, u.name, u.email, u.city, u.bio, u.avatar
        FROM users u
        JOIN user_services_offered uso ON u.id = uso.user_id
        WHERE u.city = $1 
@@ -491,7 +526,11 @@ app.get('/api/messages', authenticateToken, async (req, res) => {
     const result = await pool.query(
       `SELECT m.*, 
               u_from.name as from_name,
-              u_to.name as to_name
+              u_from.email as from_email,
+              u_from.avatar as from_avatar,
+              u_to.name as to_name,
+              u_to.email as to_email,
+              u_to.avatar as to_avatar
        FROM messages m
        JOIN users u_from ON m.from_user_id = u_from.id
        JOIN users u_to ON m.to_user_id = u_to.id
