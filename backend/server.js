@@ -27,7 +27,7 @@ async function initializeDatabase() {
   try {
     console.log('Checking database tables...');
     
-    // Check if tables exist
+    // Check if users table exists
     const tableCheck = await pool.query(`
       SELECT EXISTS (
         SELECT FROM information_schema.tables 
@@ -144,8 +144,32 @@ async function initializeDatabase() {
       
       console.log('✅ Database tables created successfully!');
     } else {
-      console.log('✅ Database tables already exist.');
+      console.log('✅ Main tables already exist.');
     }
+    
+    // Separately check and create password_resets table (for existing databases)
+    const passwordResetsCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_name = 'password_resets'
+      );
+    `);
+    
+    if (!passwordResetsCheck.rows[0].exists) {
+      console.log('Creating password_resets table...');
+      await pool.query(`
+        CREATE TABLE password_resets (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+          reset_code VARCHAR(6) NOT NULL,
+          expires_at TIMESTAMP NOT NULL,
+          used BOOLEAN DEFAULT FALSE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+      console.log('✅ Password resets table created!');
+    }
+    
   } catch (error) {
     console.error('❌ Error initializing database:', error);
     throw error;
