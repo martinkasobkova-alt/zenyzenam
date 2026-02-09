@@ -18,6 +18,123 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
+// Initialize database tables
+async function initializeDatabase() {
+  try {
+    console.log('Checking database tables...');
+    
+    // Check if tables exist
+    const tableCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_name = 'users'
+      );
+    `);
+    
+    if (!tableCheck.rows[0].exists) {
+      console.log('Tables not found. Creating tables...');
+      
+      // Create users table
+      await pool.query(`
+        CREATE TABLE users (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(100) NOT NULL,
+          email VARCHAR(255) UNIQUE NOT NULL,
+          password_hash VARCHAR(255) NOT NULL,
+          city VARCHAR(100) NOT NULL,
+          bio TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+      
+      // Create services table
+      await pool.query(`
+        CREATE TABLE services (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(100) UNIQUE NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+      
+      // Create user_services_offered table
+      await pool.query(`
+        CREATE TABLE user_services_offered (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+          service_id INTEGER REFERENCES services(id) ON DELETE CASCADE,
+          UNIQUE(user_id, service_id)
+        );
+      `);
+      
+      // Create user_services_needed table
+      await pool.query(`
+        CREATE TABLE user_services_needed (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+          service_id INTEGER REFERENCES services(id) ON DELETE CASCADE,
+          UNIQUE(user_id, service_id)
+        );
+      `);
+      
+      // Create messages table
+      await pool.query(`
+        CREATE TABLE messages (
+          id SERIAL PRIMARY KEY,
+          from_user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+          to_user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+          message TEXT NOT NULL,
+          read BOOLEAN DEFAULT FALSE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+      
+      // Insert default services
+      await pool.query(`
+        INSERT INTO services (name) VALUES
+          ('Hlídání dětí'),
+          ('Výuka jazyků'),
+          ('Koučink'),
+          ('Účetnictví'),
+          ('Právní poradenství'),
+          ('IT podpora'),
+          ('Grafický design'),
+          ('Psaní textů'),
+          ('Překlady'),
+          ('Fotografie'),
+          ('Make-up'),
+          ('Kadeřnictví'),
+          ('Masáže'),
+          ('Cvičení/fitness'),
+          ('Vaření'),
+          ('Úklid'),
+          ('Žehlení'),
+          ('Zahradničení'),
+          ('Opravy oblečení'),
+          ('Výměna oblečení'),
+          ('Společnost na aktivity'),
+          ('Doprovod k lékaři'),
+          ('Pomoc se stěhováním'),
+          ('Pomoc se zvířaty');
+      `);
+      
+      // Create indexes
+      await pool.query(`
+        CREATE INDEX idx_users_city ON users(city);
+        CREATE INDEX idx_users_email ON users(email);
+        CREATE INDEX idx_messages_from ON messages(from_user_id);
+        CREATE INDEX idx_messages_to ON messages(to_user_id);
+      `);
+      
+      console.log('✅ Database tables created successfully!');
+    } else {
+      console.log('✅ Database tables already exist.');
+    }
+  } catch (error) {
+    console.error('❌ Error initializing database:', error);
+    throw error;
+  }
+}
+
 // JWT Secret
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
@@ -391,6 +508,16 @@ app.get('/api/messages', authenticateToken, async (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+async function startServer() {
+  try {
+    await initializeDatabase();
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+startServer();
