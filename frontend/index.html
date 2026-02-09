@@ -64,6 +64,22 @@
             color: #f5576c;
         }
         
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+        
         .tabs {
             display: flex;
             background: #f8f9fa;
@@ -73,15 +89,16 @@
         
         .tab {
             flex: 1;
-            min-width: 150px;
+            min-width: 120px;
             padding: 20px;
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1.1em;
+            font-size: 1em;
             font-weight: 600;
             color: #6c757d;
             transition: all 0.3s;
+            position: relative;
         }
         
         .tab:hover {
@@ -163,6 +180,50 @@
             height: 20px;
             margin-right: 10px;
             cursor: pointer;
+        }
+        
+        /* Avatar Styles */
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .avatar-option {
+            text-align: center;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 12px;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .avatar-option:hover {
+            background: #f8f9fa;
+            transform: scale(1.05);
+        }
+        
+        .avatar-option.selected {
+            border-color: #f5576c;
+            background: #fff5f7;
+        }
+        
+        .avatar-icon {
+            font-size: 4em;
+            margin-bottom: 5px;
+        }
+        
+        .avatar-label {
+            font-size: 0.85em;
+            color: #6c757d;
+        }
+        
+        .avatar-display {
+            display: inline-block;
+            font-size: 3em;
+            margin-right: 15px;
+            vertical-align: middle;
         }
         
         .btn {
@@ -335,6 +396,70 @@
             font-family: inherit;
         }
         
+        /* Messages Tab Styles */
+        .messages-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .conversation-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .conversation-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .conversation-item:hover {
+            background: #e9ecef;
+            border-left-color: #f5576c;
+        }
+        
+        .conversation-item.unread {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+        
+        .conversation-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .conversation-avatar {
+            font-size: 2.5em;
+            margin-right: 15px;
+        }
+        
+        .conversation-info h4 {
+            color: #f5576c;
+            margin-bottom: 5px;
+        }
+        
+        .conversation-info .email {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        
+        .conversation-preview {
+            color: #495057;
+            margin-top: 10px;
+            font-size: 0.95em;
+        }
+        
+        .conversation-time {
+            color: #6c757d;
+            font-size: 0.85em;
+            text-align: right;
+        }
+        
         .alert {
             padding: 15px;
             border-radius: 8px;
@@ -403,6 +528,19 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        .password-match {
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .password-match.valid {
+            color: #28a745;
+        }
+        
+        .password-match.invalid {
+            color: #dc3545;
+        }
     </style>
 </head>
 <body>
@@ -417,6 +555,10 @@
             <button class="tab active" data-tab="login">🔐 Přihlášení</button>
             <button class="tab hidden" data-tab="profile">👤 Můj profil</button>
             <button class="tab hidden" data-tab="search">🔍 Hledat</button>
+            <button class="tab hidden" data-tab="messages" style="position: relative;">
+                💬 Zprávy
+                <span class="notification-badge hidden" id="message-badge">0</span>
+            </button>
         </div>
         
         <div class="content">
@@ -463,13 +605,111 @@
                     </div>
                     
                     <div class="form-group">
-                        <label>Heslo *</label>
-                        <input type="password" id="register-password" placeholder="Alespoň 6 znaků">
+                        <label>Heslo * (minimálně 6 znaků)</label>
+                        <input type="password" id="register-password" placeholder="Alespoň 6 znaků" oninput="checkPasswordMatch()">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Potvrď heslo *</label>
+                        <input type="password" id="register-password-confirm" placeholder="Zadej heslo znovu" oninput="checkPasswordMatch()">
+                        <div id="password-match-msg" class="password-match"></div>
                     </div>
                     
                     <div class="form-group">
                         <label>Město / Lokalita *</label>
-                        <input type="text" id="register-city" placeholder="Např. Praha, Brno, Ostrava...">
+                        <select id="register-city">
+                            <option value="">-- Vyber město --</option>
+                            <optgroup label="Hlavní město">
+                                <option value="Praha">Praha</option>
+                            </optgroup>
+                            <optgroup label="Krajská města">
+                                <option value="Brno">Brno</option>
+                                <option value="Ostrava">Ostrava</option>
+                                <option value="Plzeň">Plzeň</option>
+                                <option value="Liberec">Liberec</option>
+                                <option value="Olomouc">Olomouc</option>
+                                <option value="České Budějovice">České Budějovice</option>
+                                <option value="Hradec Králové">Hradec Králové</option>
+                                <option value="Ústí nad Labem">Ústí nad Labem</option>
+                                <option value="Pardubice">Pardubice</option>
+                                <option value="Zlín">Zlín</option>
+                                <option value="Havířov">Havířov</option>
+                                <option value="Kladno">Kladno</option>
+                                <option value="Most">Most</option>
+                                <option value="Opava">Opava</option>
+                                <option value="Karviná">Karviná</option>
+                                <option value="Frýdek-Místek">Frýdek-Místek</option>
+                            </optgroup>
+                            <optgroup label="Další větší města">
+                                <option value="Jihlava">Jihlava</option>
+                                <option value="Teplice">Teplice</option>
+                                <option value="Karlovy Vary">Karlovy Vary</option>
+                                <option value="Děčín">Děčín</option>
+                                <option value="Chomutov">Chomutov</option>
+                                <option value="Jablonec nad Nisou">Jablonec nad Nisou</option>
+                                <option value="Mladá Boleslav">Mladá Boleslav</option>
+                                <option value="Prostějov">Prostějov</option>
+                                <option value="Přerov">Přerov</option>
+                                <option value="Třinec">Třinec</option>
+                                <option value="Třebíč">Třebíč</option>
+                                <option value="Tábor">Tábor</option>
+                                <option value="Znojmo">Znojmo</option>
+                                <option value="Příbram">Příbram</option>
+                                <option value="Cheb">Cheb</option>
+                                <option value="Orlová">Orlová</option>
+                                <option value="Kroměříž">Kroměříž</option>
+                                <option value="Hodonín">Hodonín</option>
+                                <option value="Vítkovice">Vítkovice</option>
+                                <option value="Šumperk">Šumperk</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Vyber si avatar *</label>
+                        <div class="avatar-grid" id="avatar-grid">
+                            <div class="avatar-option selected" data-avatar="avatar1" onclick="selectAvatar('avatar1')">
+                                <div class="avatar-icon">👩</div>
+                                <div class="avatar-label">Základní</div>
+                            </div>
+                            <div class="avatar-option" data-avatar="avatar2" onclick="selectAvatar('avatar2')">
+                                <div class="avatar-icon">👩‍🦰</div>
+                                <div class="avatar-label">Zrzka</div>
+                            </div>
+                            <div class="avatar-option" data-avatar="avatar3" onclick="selectAvatar('avatar3')">
+                                <div class="avatar-icon">👱‍♀️</div>
+                                <div class="avatar-label">Blondýnka</div>
+                            </div>
+                            <div class="avatar-option" data-avatar="avatar4" onclick="selectAvatar('avatar4')">
+                                <div class="avatar-icon">👩‍🦱</div>
+                                <div class="avatar-label">Kudrnaté vlasy</div>
+                            </div>
+                            <div class="avatar-option" data-avatar="avatar5" onclick="selectAvatar('avatar5')">
+                                <div class="avatar-icon">👩‍🦳</div>
+                                <div class="avatar-label">Šedivé vlasy</div>
+                            </div>
+                            <div class="avatar-option" data-avatar="avatar6" onclick="selectAvatar('avatar6')">
+                                <div class="avatar-icon">🧕</div>
+                                <div class="avatar-label">S šátkem</div>
+                            </div>
+                            <div class="avatar-option" data-avatar="avatar7" onclick="selectAvatar('avatar7')">
+                                <div class="avatar-icon">👓</div>
+                                <div class="avatar-label">S brýlemi</div>
+                            </div>
+                            <div class="avatar-option" data-avatar="avatar8" onclick="selectAvatar('avatar8')">
+                                <div class="avatar-icon">🎀</div>
+                                <div class="avatar-label">S mašlí</div>
+                            </div>
+                            <div class="avatar-option" data-avatar="avatar9" onclick="selectAvatar('avatar9')">
+                                <div class="avatar-icon">💼</div>
+                                <div class="avatar-label">Business</div>
+                            </div>
+                            <div class="avatar-option" data-avatar="avatar10" onclick="selectAvatar('avatar10')">
+                                <div class="avatar-icon">🌸</div>
+                                <div class="avatar-label">S květinou</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="selected-avatar" value="avatar1">
                     </div>
                     
                     <div class="form-group">
@@ -507,19 +747,43 @@
             <div id="search-tab" class="tab-content">
                 <div id="search-content"></div>
             </div>
+            
+            <!-- MESSAGES TAB -->
+            <div id="messages-tab" class="tab-content">
+                <div class="messages-container">
+                    <h2 style="margin-bottom: 20px; color: #495057;">💬 Moje zprávy</h2>
+                    <div id="messages-content"></div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // API Configuration - ZMĚŇ TUTO URL na svou Render URL!
-        API_URL = 'https://zenyzenam.onrender.com/api'; // Změň na https://tvoje-app.onrender.com/api
+        // API Configuration
+        const API_URL = 'https://zenyzenam.onrender.com/api';
+        
+        // Avatar map
+        const AVATAR_ICONS = {
+            'avatar1': '👩',
+            'avatar2': '👩‍🦰',
+            'avatar3': '👱‍♀️',
+            'avatar4': '👩‍🦱',
+            'avatar5': '👩‍🦳',
+            'avatar6': '🧕',
+            'avatar7': '👓',
+            'avatar8': '🎀',
+            'avatar9': '💼',
+            'avatar10': '🌸'
+        };
         
         let services = [];
         let currentUser = null;
         let token = null;
         let editMode = false;
+        let selectedAvatar = 'avatar1';
+        let unreadMessages = 0;
         
-        // API Helper functions
+        // API Helper
         async function apiCall(endpoint, options = {}) {
             const config = {
                 headers: {
@@ -539,13 +803,10 @@
             return data;
         }
         
-        // Load services and check auth
+        // Init
         async function init() {
             try {
-                // Load services
                 services = await apiCall('/services');
-                
-                // Check if user is logged in
                 const savedToken = localStorage.getItem('token');
                 if (savedToken) {
                     token = savedToken;
@@ -558,12 +819,12 @@
             renderServiceCheckboxes();
         }
         
-        // Load user profile
         async function loadUserProfile() {
             try {
                 currentUser = await apiCall('/profile');
                 showLoggedInState();
                 renderProfile();
+                loadMessages();
             } catch (error) {
                 console.error('Failed to load profile:', error);
                 localStorage.removeItem('token');
@@ -571,7 +832,41 @@
             }
         }
         
-        // Show/hide forms
+        // Avatar selection
+        function selectAvatar(avatar) {
+            document.querySelectorAll('.avatar-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelector(`[data-avatar="${avatar}"]`).classList.add('selected');
+            document.getElementById('selected-avatar').value = avatar;
+            selectedAvatar = avatar;
+        }
+        
+        function getAvatarIcon(avatar) {
+            return AVATAR_ICONS[avatar] || '👩';
+        }
+        
+        // Password match check
+        function checkPasswordMatch() {
+            const pwd = document.getElementById('register-password').value;
+            const confirm = document.getElementById('register-password-confirm').value;
+            const msg = document.getElementById('password-match-msg');
+            
+            if (!confirm) {
+                msg.textContent = '';
+                return;
+            }
+            
+            if (pwd === confirm) {
+                msg.textContent = '✓ Hesla se shodují';
+                msg.className = 'password-match valid';
+            } else {
+                msg.textContent = '✗ Hesla se neshodují';
+                msg.className = 'password-match invalid';
+            }
+        }
+        
+        // Forms
         function showRegisterForm() {
             document.getElementById('login-form').classList.add('hidden');
             document.getElementById('register-form').classList.remove('hidden');
@@ -584,7 +879,7 @@
         }
         
         function showLoggedInState() {
-            document.querySelectorAll('[data-tab="profile"], [data-tab="search"]').forEach(tab => {
+            document.querySelectorAll('[data-tab="profile"], [data-tab="search"], [data-tab="messages"]').forEach(tab => {
                 tab.classList.remove('hidden');
             });
             document.querySelector('[data-tab="login"]').classList.add('hidden');
@@ -625,6 +920,8 @@
                 
                 document.getElementById('login-email').value = '';
                 document.getElementById('login-password').value = '';
+                
+                loadMessages();
             } catch (error) {
                 errorDiv.textContent = error.message;
                 errorDiv.classList.remove('hidden');
@@ -639,8 +936,10 @@
             const name = document.getElementById('register-name').value;
             const email = document.getElementById('register-email').value;
             const password = document.getElementById('register-password').value;
+            const passwordConfirm = document.getElementById('register-password-confirm').value;
             const city = document.getElementById('register-city').value;
             const bio = document.getElementById('register-bio').value;
+            const avatar = document.getElementById('selected-avatar').value;
             const errorDiv = document.getElementById('register-error');
             const btn = document.getElementById('register-btn');
             
@@ -658,6 +957,12 @@
                 return;
             }
             
+            if (password !== passwordConfirm) {
+                errorDiv.textContent = 'Hesla se neshodují';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
             const servicesOffered = Array.from(document.querySelectorAll('input[name="register-offer"]:checked'))
                 .map(cb => parseInt(cb.value));
             const servicesNeeded = Array.from(document.querySelectorAll('input[name="register-need"]:checked'))
@@ -670,13 +975,8 @@
                 const response = await apiCall('/register', {
                     method: 'POST',
                     body: JSON.stringify({
-                        name,
-                        email,
-                        password,
-                        city,
-                        bio,
-                        servicesOffered,
-                        servicesNeeded
+                        name, email, password, city, bio, avatar,
+                        servicesOffered, servicesNeeded
                     })
                 });
                 
@@ -686,13 +986,6 @@
                 await loadUserProfile();
                 showLoggedInState();
                 switchTab('profile');
-                
-                // Reset form
-                document.getElementById('register-name').value = '';
-                document.getElementById('register-email').value = '';
-                document.getElementById('register-password').value = '';
-                document.getElementById('register-city').value = '';
-                document.getElementById('register-bio').value = '';
             } catch (error) {
                 errorDiv.textContent = error.message;
                 errorDiv.classList.remove('hidden');
@@ -709,7 +1002,7 @@
                 currentUser = null;
                 localStorage.removeItem('token');
                 
-                document.querySelectorAll('[data-tab="profile"], [data-tab="search"]').forEach(tab => {
+                document.querySelectorAll('[data-tab="profile"], [data-tab="search"], [data-tab="messages"]').forEach(tab => {
                     tab.classList.add('hidden');
                 });
                 document.querySelector('[data-tab="login"]').classList.remove('hidden');
@@ -720,7 +1013,7 @@
             }
         }
         
-        // Render service checkboxes
+        // Services
         function renderServiceCheckboxes() {
             const offerContainer = document.getElementById('register-services-offer');
             const needContainer = document.getElementById('register-services-need');
@@ -752,15 +1045,19 @@
             }
         }
         
-        // Profile rendering
+        // Profile
         function renderProfile() {
             if (!currentUser) return;
             
             const container = document.getElementById('profile-content');
+            const avatarIcon = getAvatarIcon(currentUser.avatar);
             
             let html = `
                 <div class="profile-card">
-                    <h3>Vítej, ${currentUser.name}! 👋</h3>
+                    <h3>
+                        <span class="avatar-display">${avatarIcon}</span>
+                        Vítej, ${currentUser.name}! 👋
+                    </h3>
                     <div class="profile-info">
                         <div class="info-item">
                             <strong>📍 Lokalita</strong>
@@ -784,11 +1081,36 @@
             
             html += `</div>`;
             
-            // Edit mode
             if (editMode) {
                 html += `
                     <div class="edit-mode">
-                        <h3 style="margin-bottom: 15px;">✏️ Úprava služeb</h3>
+                        <h3 style="margin-bottom: 15px;">✏️ Úprava profilu</h3>
+                        
+                        <div class="form-group">
+                            <label>Město</label>
+                            <select id="edit-city">
+                                <optgroup label="Hlavní město">
+                                    <option value="Praha">Praha</option>
+                                </optgroup>
+                                <optgroup label="Krajská města">
+                                    <option value="Brno">Brno</option>
+                                    <option value="Ostrava">Ostrava</option>
+                                    <option value="Plzeň">Plzeň</option>
+                                    <option value="Liberec">Liberec</option>
+                                    <option value="Olomouc">Olomouc</option>
+                                    <option value="České Budějovice">České Budějovice</option>
+                                    <option value="Hradec Králové">Hradec Králové</option>
+                                    <option value="Ústí nad Labem">Ústí nad Labem</option>
+                                    <option value="Pardubice">Pardubice</option>
+                                    <option value="Zlín">Zlín</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Avatar</label>
+                            <div class="avatar-grid" id="edit-avatar-grid"></div>
+                        </div>
                         
                         <div class="form-group">
                             <label>✅ Služby, které nabízím</label>
@@ -845,7 +1167,7 @@
             if (!editMode) {
                 html += `
                     <div class="action-buttons">
-                        <button class="btn btn-warning" onclick="startProfileEdit()">✏️ Upravit služby</button>
+                        <button class="btn btn-warning" onclick="startProfileEdit()">✏️ Upravit profil</button>
                         <button class="btn btn-danger" onclick="deleteProfile()">🗑️ Smazat profil</button>
                     </div>
                 `;
@@ -854,8 +1176,34 @@
             container.innerHTML = html;
             
             if (editMode) {
+                document.getElementById('edit-city').value = currentUser.city;
+                renderEditAvatars();
                 renderEditCheckboxes();
             }
+        }
+        
+        function renderEditAvatars() {
+            const container = document.getElementById('edit-avatar-grid');
+            container.innerHTML = '';
+            
+            Object.keys(AVATAR_ICONS).forEach(avatarKey => {
+                const div = document.createElement('div');
+                div.className = 'avatar-option' + (currentUser.avatar === avatarKey ? ' selected' : '');
+                div.setAttribute('data-avatar', avatarKey);
+                div.onclick = () => selectEditAvatar(avatarKey);
+                div.innerHTML = `
+                    <div class="avatar-icon">${AVATAR_ICONS[avatarKey]}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function selectEditAvatar(avatar) {
+            document.querySelectorAll('#edit-avatar-grid .avatar-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelector(`#edit-avatar-grid [data-avatar="${avatar}"]`).classList.add('selected');
+            selectedAvatar = avatar;
         }
         
         function renderEditCheckboxes() {
@@ -893,6 +1241,7 @@
         
         function startProfileEdit() {
             editMode = true;
+            selectedAvatar = currentUser.avatar;
             renderProfile();
         }
         
@@ -902,12 +1251,23 @@
         }
         
         async function saveProfileEdit() {
+            const city = document.getElementById('edit-city').value;
             const servicesOffered = Array.from(document.querySelectorAll('input[name="edit-offer"]:checked'))
                 .map(cb => parseInt(cb.value));
             const servicesNeeded = Array.from(document.querySelectorAll('input[name="edit-need"]:checked'))
                 .map(cb => parseInt(cb.value));
             
             try {
+                await apiCall('/profile/city', {
+                    method: 'PUT',
+                    body: JSON.stringify({ city })
+                });
+                
+                await apiCall('/profile/avatar', {
+                    method: 'PUT',
+                    body: JSON.stringify({ avatar: selectedAvatar })
+                });
+                
                 await apiCall('/profile/services', {
                     method: 'PUT',
                     body: JSON.stringify({ servicesOffered, servicesNeeded })
@@ -917,7 +1277,7 @@
                 editMode = false;
                 renderProfile();
                 
-                alert('✅ Služby byly úspěšně aktualizovány!');
+                alert('✅ Profil byl úspěšně aktualizován!');
             } catch (error) {
                 alert('Chyba: ' + error.message);
             }
@@ -927,7 +1287,6 @@
             if (confirm('⚠️ Opravdu chceš smazat svůj profil? Tato akce je nevratná!')) {
                 try {
                     await apiCall('/profile', { method: 'DELETE' });
-                    
                     logout();
                     alert('✅ Profil byl smazán.');
                 } catch (error) {
@@ -955,10 +1314,12 @@
                 if (matches.length > 0) {
                     html += '<div class="users-grid">';
                     matches.forEach(user => {
+                        const avatarIcon = getAvatarIcon(user.avatar);
                         html += `
                             <div class="user-card">
-                                <h4>${user.name}</h4>
+                                <h4><span class="avatar-display" style="font-size: 2em;">${avatarIcon}</span> ${user.name}</h4>
                                 <div class="location">📍 ${user.city}</div>
+                                <div class="location">📧 ${user.email}</div>
                         `;
                         
                         if (user.bio) {
@@ -981,7 +1342,7 @@
                                 </button>
                                 <div class="message-box" id="msg-${user.id}">
                                     <textarea id="msg-text-${user.id}" rows="3" placeholder="Napiš ${user.name} zprávu..."></textarea>
-                                    <button class="btn btn-primary btn-small" onclick="sendMessage(${user.id})">Odeslat</button>
+                                    <button class="btn btn-primary btn-small" onclick="sendMessage(${user.id}, '${user.name}', '${user.email}')">Odeslat</button>
                                     <button class="btn btn-secondary btn-small" onclick="hideMessageBox(${user.id})">Zrušit</button>
                                 </div>
                             </div>
@@ -992,19 +1353,14 @@
                     html += `
                         <div class="alert alert-info">
                             <strong>🔍 Zatím nejsou k dispozici žádné shody</strong>
-                            <p style="margin-top: 10px;">V tvém městě zatím nejsou ženy, které nabízejí služby, o které máš zájem. Zkus to znovu později nebo uprav své preference!</p>
+                            <p style="margin-top: 10px;">V tvém městě zatím nejsou ženy, které nabízejí služby, o které máš zájem.</p>
                         </div>
                     `;
                 }
                 
                 container.innerHTML = html;
             } catch (error) {
-                container.innerHTML = `
-                    <div class="alert alert-danger">
-                        <strong>Chyba při vyhledávání</strong>
-                        <p>${error.message}</p>
-                    </div>
-                `;
+                container.innerHTML = `<div class="alert alert-danger"><strong>Chyba při vyhledávání</strong><p>${error.message}</p></div>`;
             }
         }
         
@@ -1016,7 +1372,7 @@
             document.getElementById('msg-' + userId).classList.remove('active');
         }
         
-        async function sendMessage(userId) {
+        async function sendMessage(userId, userName, userEmail) {
             const message = document.getElementById('msg-text-' + userId).value;
             
             if (!message.trim()) {
@@ -1030,12 +1386,102 @@
                     body: JSON.stringify({ toUserId: userId, message })
                 });
                 
-                alert(`Zpráva odeslána!\n\nNa váš email byl odeslán návod s bezpečnostními pokyny:\n\n✓ Setkejte se vždy na veřejném místě\n✓ Řekněte někomu blízkému, kde budete\n✓ Mějte nabitý telefon\n✓ Důvěřujte svému instinktu`);
+                alert(`✅ Zpráva odeslána pro ${userName}!\n\n📧 Kontakt: ${userEmail}\n\n⚠️ BEZPEČNOSTNÍ POKYNY:\n\n✓ Setkejte se vždy na veřejném místě\n✓ Řekněte někomu blízkému, kde budete\n✓ Mějte nabitý telefon\n✓ Důvěřujte svému instinktu`);
                 
                 document.getElementById('msg-text-' + userId).value = '';
                 hideMessageBox(userId);
+                
+                loadMessages();
             } catch (error) {
                 alert('Chyba: ' + error.message);
+            }
+        }
+        
+        // Messages
+        async function loadMessages() {
+            if (!currentUser) return;
+            
+            try {
+                const messages = await apiCall('/messages');
+                
+                const grouped = {};
+                messages.forEach(msg => {
+                    const otherUserId = msg.from_user_id === currentUser.id ? msg.to_user_id : msg.from_user_id;
+                    if (!grouped[otherUserId]) {
+                        grouped[otherUserId] = [];
+                    }
+                    grouped[otherUserId].push(msg);
+                });
+                
+                const conversations = Object.keys(grouped).map(userId => {
+                    const msgs = grouped[userId];
+                    const lastMsg = msgs[0];
+                    const otherUser = lastMsg.from_user_id === currentUser.id ? 
+                        { id: lastMsg.to_user_id, name: lastMsg.to_name, email: lastMsg.to_email, avatar: lastMsg.to_avatar } :
+                        { id: lastMsg.from_user_id, name: lastMsg.from_name, email: lastMsg.from_email, avatar: lastMsg.from_avatar };
+                    
+                    return {
+                        user: otherUser,
+                        lastMessage: lastMsg,
+                        messages: msgs
+                    };
+                });
+                
+                renderMessages(conversations);
+                
+                unreadMessages = conversations.length;
+                updateMessageBadge();
+            } catch (error) {
+                console.error('Failed to load messages:', error);
+            }
+        }
+        
+        function renderMessages(conversations) {
+            const container = document.getElementById('messages-content');
+            
+            if (conversations.length === 0) {
+                container.innerHTML = `
+                    <div class="alert alert-info">
+                        <strong>📭 Zatím žádné zprávy</strong>
+                        <p style="margin-top: 10px;">Když ti někdo napíše, uvidíš to tady!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<div class="conversation-list">';
+            
+            conversations.forEach(conv => {
+                const avatarIcon = getAvatarIcon(conv.user.avatar);
+                const time = new Date(conv.lastMessage.created_at).toLocaleString('cs-CZ');
+                const preview = conv.lastMessage.message.substring(0, 100) + (conv.lastMessage.message.length > 100 ? '...' : '');
+                
+                html += `
+                    <div class="conversation-item">
+                        <div class="conversation-header">
+                            <div class="conversation-avatar">${avatarIcon}</div>
+                            <div class="conversation-info">
+                                <h4>${conv.user.name}</h4>
+                                <div class="email">📧 ${conv.user.email}</div>
+                            </div>
+                        </div>
+                        <div class="conversation-preview">"${preview}"</div>
+                        <div class="conversation-time">${time}</div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        function updateMessageBadge() {
+            const badge = document.getElementById('message-badge');
+            if (unreadMessages > 0) {
+                badge.textContent = unreadMessages;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
             }
         }
         
@@ -1064,13 +1510,22 @@
             
             if (tabName === 'search') {
                 renderSearch();
+            } else if (tabName === 'messages') {
+                loadMessages();
             }
         }
         
-        // Init
+        // Init on load
         document.addEventListener('DOMContentLoaded', function() {
             setupTabs();
             init();
+            
+            // Check for new messages every 30 seconds
+            setInterval(() => {
+                if (currentUser) {
+                    loadMessages();
+                }
+            }, 30000);
         });
     </script>
 </body>
