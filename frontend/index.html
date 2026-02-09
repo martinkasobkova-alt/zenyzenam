@@ -12,108 +12,113 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f5f7fa;
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            min-height: 100vh;
         }
         
         .header {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: #2c3e50;
             color: white;
-            padding: 30px;
-            text-align: center;
+            padding: 24px 40px;
+            border-bottom: 3px solid #34495e;
             position: relative;
         }
         
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 1.75em;
+            font-weight: 600;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
         }
         
         .header p {
-            font-size: 1.1em;
-            opacity: 0.95;
+            font-size: 0.95em;
+            opacity: 0.85;
+            font-weight: 400;
         }
         
         .logout-btn {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.2);
+            top: 24px;
+            right: 40px;
+            padding: 8px 20px;
+            background: transparent;
             color: white;
-            border: 2px solid white;
-            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.3);
             cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 0.9em;
+            transition: all 0.2s;
         }
         
         .logout-btn:hover {
-            background: white;
-            color: #f5576c;
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.5);
         }
         
         .notification-badge {
             position: absolute;
             top: -5px;
             right: -5px;
-            background: #ff4444;
+            background: #e74c3c;
             color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.7em;
-            font-weight: bold;
+            font-weight: 600;
         }
         
         .tabs {
             display: flex;
-            background: #f8f9fa;
-            border-bottom: 2px solid #dee2e6;
+            background: #ecf0f1;
+            border-bottom: 1px solid #bdc3c7;
             flex-wrap: wrap;
         }
         
         .tab {
             flex: 1;
             min-width: 120px;
-            padding: 20px;
+            padding: 16px 20px;
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            color: #6c757d;
-            transition: all 0.3s;
+            font-size: 0.9em;
+            font-weight: 500;
+            color: #7f8c8d;
+            transition: all 0.2s;
             position: relative;
+            border-bottom: 2px solid transparent;
         }
         
         .tab:hover {
-            background: #e9ecef;
+            background: #dfe4e8;
+            color: #2c3e50;
         }
         
         .tab.active {
             background: white;
-            color: #f5576c;
-            border-bottom: 3px solid #f5576c;
+            color: #2c3e50;
+            border-bottom-color: #3498db;
+            font-weight: 600;
         }
         
         .content {
-            padding: 30px;
+            padding: 40px;
             min-height: 400px;
+            background: #fafbfc;
         }
         
         .tab-content {
@@ -227,52 +232,61 @@
         }
         
         .btn {
-            padding: 12px 30px;
+            padding: 10px 24px;
             border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
-            font-weight: 600;
+            font-size: 0.95em;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            font-family: inherit;
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #3498db;
             color: white;
         }
         
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            background: #2980b9;
         }
         
         .btn-primary:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
         }
         
         .btn-secondary {
-            background: #6c757d;
+            background: #95a5a6;
             color: white;
             margin-left: 10px;
         }
         
         .btn-secondary:hover {
-            background: #5a6268;
+            background: #7f8c8d;
         }
         
         .btn-small {
-            padding: 6px 12px;
-            font-size: 0.9em;
+            padding: 6px 16px;
+            font-size: 0.85em;
         }
         
         .btn-danger {
-            background: #dc3545;
+            background: #e74c3c;
             color: white;
         }
         
         .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #d68910;
+        }
             background: #c82333;
         }
         
@@ -587,6 +601,59 @@
                         Ještě nemáš účet? 
                         <button class="btn-link" onclick="showRegisterForm()">Zaregistruj se</button>
                     </p>
+                    
+                    <p style="margin-top: 10px; color: #6c757d;">
+                        Zapomněla jsi heslo? 
+                        <button class="btn-link" onclick="showPasswordResetForm()">Resetovat heslo</button>
+                    </p>
+                </div>
+                
+                <div id="password-reset-form" class="hidden">
+                    <h2 style="margin-bottom: 25px; color: #495057;">Resetovat heslo</h2>
+                    
+                    <div id="reset-error" class="alert alert-danger hidden"></div>
+                    <div id="reset-success" class="alert alert-success hidden"></div>
+                    
+                    <div id="reset-step-1">
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input type="email" id="reset-email" placeholder="tvuj@email.cz">
+                        </div>
+                        
+                        <button type="button" class="btn btn-primary" onclick="requestPasswordReset()" id="reset-request-btn">
+                            Poslat reset kód
+                        </button>
+                    </div>
+                    
+                    <div id="reset-step-2" class="hidden">
+                        <div class="alert alert-info">
+                            <strong>Reset kód:</strong> <span id="display-reset-code" style="font-size: 1.5em; font-weight: bold;"></span>
+                            <p style="margin-top: 10px;">Zkopíruj tento kód a zadej ho níže spolu s novým heslem.</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Reset kód *</label>
+                            <input type="text" id="reset-code" placeholder="6-místný kód" maxlength="6">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Nové heslo *</label>
+                            <input type="password" id="reset-new-password" placeholder="Alespoň 6 znaků">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Potvrď nové heslo *</label>
+                            <input type="password" id="reset-confirm-password" placeholder="Zadej heslo znovu">
+                        </div>
+                        
+                        <button type="button" class="btn btn-primary" onclick="confirmPasswordReset()" id="reset-confirm-btn">
+                            Změnit heslo
+                        </button>
+                    </div>
+                    
+                    <p style="margin-top: 20px; color: #6c757d;">
+                        <button class="btn-link" onclick="showLoginForm()">Zpět na přihlášení</button>
+                    </p>
                 </div>
                 
                 <div id="register-form" class="hidden">
@@ -866,15 +933,122 @@
             }
         }
         
+        // Password Reset Functions
+        function showPasswordResetForm() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('password-reset-form').classList.remove('hidden');
+            document.getElementById('reset-step-1').classList.remove('hidden');
+            document.getElementById('reset-step-2').classList.add('hidden');
+            document.getElementById('reset-error').classList.add('hidden');
+            document.getElementById('reset-success').classList.add('hidden');
+        }
+        
+        async function requestPasswordReset() {
+            const email = document.getElementById('reset-email').value;
+            const errorDiv = document.getElementById('reset-error');
+            const successDiv = document.getElementById('reset-success');
+            const btn = document.getElementById('reset-request-btn');
+            
+            errorDiv.classList.add('hidden');
+            successDiv.classList.add('hidden');
+            
+            if (!email) {
+                errorDiv.textContent = 'Prosím zadej email';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Generuji kód...';
+                
+                const response = await apiCall('/password-reset/request', {
+                    method: 'POST',
+                    body: JSON.stringify({ email })
+                });
+                
+                document.getElementById('display-reset-code').textContent = response.resetCode;
+                document.getElementById('reset-step-1').classList.add('hidden');
+                document.getElementById('reset-step-2').classList.remove('hidden');
+                
+                successDiv.textContent = 'Reset kód byl vygenerován!';
+                successDiv.classList.remove('hidden');
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Poslat reset kód';
+            }
+        }
+        
+        async function confirmPasswordReset() {
+            const email = document.getElementById('reset-email').value;
+            const resetCode = document.getElementById('reset-code').value;
+            const newPassword = document.getElementById('reset-new-password').value;
+            const confirmPassword = document.getElementById('reset-confirm-password').value;
+            const errorDiv = document.getElementById('reset-error');
+            const btn = document.getElementById('reset-confirm-btn');
+            
+            errorDiv.classList.add('hidden');
+            
+            if (!resetCode || !newPassword || !confirmPassword) {
+                errorDiv.textContent = 'Prosím vyplň všechna pole';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                errorDiv.textContent = 'Hesla se neshodují';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                errorDiv.textContent = 'Heslo musí mít alespoň 6 znaků';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Měním heslo...';
+                
+                await apiCall('/password-reset/confirm', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, resetCode, newPassword })
+                });
+                
+                alert('✅ Heslo bylo úspěšně změněno! Nyní se můžeš přihlásit.');
+                
+                // Reset form
+                document.getElementById('reset-email').value = '';
+                document.getElementById('reset-code').value = '';
+                document.getElementById('reset-new-password').value = '';
+                document.getElementById('reset-confirm-password').value = '';
+                
+                showLoginForm();
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Změnit heslo';
+            }
+        }
+        
         // Forms
         function showRegisterForm() {
             document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('password-reset-form').classList.add('hidden');
             document.getElementById('register-form').classList.remove('hidden');
             renderServiceCheckboxes();
         }
         
         function showLoginForm() {
             document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('password-reset-form').classList.add('hidden');
             document.getElementById('login-form').classList.remove('hidden');
         }
         
