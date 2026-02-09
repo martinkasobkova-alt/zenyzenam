@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ženy Ženám - Výměna služeb</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+        
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: white;
+            color: #f5576c;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            flex: 1;
+            min-width: 150px;
+            padding: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            background: #e9ecef;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #f5576c;
+            border-bottom: 3px solid #f5576c;
+        }
+        
+        .content {
+            padding: 30px;
+            min-height: 400px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #f5576c;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .checkbox-item:hover {
+            background: #e9ecef;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            margin-left: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.9em;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .btn-link {
+            background: none;
+            color: #667eea;
+            padding: 5px;
+            text-decoration: underline;
+        }
+        
+        .profile-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .profile-card h3 {
+            color: #f5576c;
+            margin-bottom: 10px;
+        }
+        
+        .profile-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .info-item strong {
+            color: #495057;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .user-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+        
+        .user-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .user-card h4 {
+            color: #f5576c;
+            margin-bottom: 10px;
+        }
+        
+        .user-card .location {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        
+        .services-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        .tag {
+            padding: 6px 12px;
+            background: white;
+            border-radius: 20px;
+            font-size: 0.85em;
+            color: #495057;
+        }
+        
+        .tag.offer {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .tag.need {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .message-box {
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .message-box.active {
+            display: block;
+        }
+        
+        .message-box textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1em;
+            margin-bottom: 10px;
+            font-family: inherit;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .edit-mode {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="logout-btn hidden" id="logout-btn" onclick="logout()">🚪 Odhlásit se</button>
+            <h1>💜 Ženy Ženám</h1>
+            <p>Komunita pro výměnu služeb a vzájemnou podporu</p>
+        </div>
+        
+        <div class="tabs" id="tabs">
+            <button class="tab active" data-tab="login">🔐 Přihlášení</button>
+            <button class="tab hidden" data-tab="profile">👤 Můj profil</button>
+            <button class="tab hidden" data-tab="search">🔍 Hledat</button>
+        </div>
+        
+        <div class="content">
+            <!-- LOGIN/REGISTER TAB -->
+            <div id="login-tab" class="tab-content active">
+                <div id="login-form">
+                    <h2 style="margin-bottom: 25px; color: #495057;">Přihlášení</h2>
+                    
+                    <div id="login-error" class="alert alert-danger hidden"></div>
+                    
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="login-email" placeholder="tvuj@email.cz">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Heslo *</label>
+                        <input type="password" id="login-password" placeholder="••••••••">
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" onclick="handleLogin()" id="login-btn">
+                        Přihlásit se
+                    </button>
+                    
+                    <p style="margin-top: 20px; color: #6c757d;">
+                        Ještě nemáš účet? 
+                        <button class="btn-link" onclick="showRegisterForm()">Zaregistruj se</button>
+                    </p>
+                </div>
+                
+                <div id="register-form" class="hidden">
+                    <h2 style="margin-bottom: 25px; color: #495057;">Vytvoř si profil</h2>
+                    
+                    <div id="register-error" class="alert alert-danger hidden"></div>
+                    
+                    <div class="form-group">
+                        <label>Jméno / Přezdívka *</label>
+                        <input type="text" id="register-name" placeholder="Jak se ti můžeme říkat?">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="register-email" placeholder="tvuj@email.cz">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Heslo *</label>
+                        <input type="password" id="register-password" placeholder="Alespoň 6 znaků">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Město / Lokalita *</label>
+                        <input type="text" id="register-city" placeholder="Např. Praha, Brno, Ostrava...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>O mně (nepovinné)</label>
+                        <textarea id="register-bio" rows="3" placeholder="Krátký popis o tobě, tvých zájmech nebo zkušenostech..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>✅ Služby, které nabízím</label>
+                        <div class="checkbox-group" id="register-services-offer"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>🔍 Služby, které hledám</label>
+                        <div class="checkbox-group" id="register-services-need"></div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" onclick="handleRegister()" id="register-btn">
+                        Vytvořit profil
+                    </button>
+                    
+                    <p style="margin-top: 20px; color: #6c757d;">
+                        Už máš účet? 
+                        <button class="btn-link" onclick="showLoginForm()">Přihlas se</button>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- PROFILE TAB -->
+            <div id="profile-tab" class="tab-content">
+                <div id="profile-content"></div>
+            </div>
+            
+            <!-- SEARCH TAB -->
+            <div id="search-tab" class="tab-content">
+                <div id="search-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration - ZMĚŇ TUTO URL na svou Render URL!
+        const API_URL = 'http://localhost:3000/api'; // Změň na https://tvoje-app.onrender.com/api
+        
+        let services = [];
+        let currentUser = null;
+        let token = null;
+        let editMode = false;
+        
+        // API Helper functions
+        async function apiCall(endpoint, options = {}) {
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token && { 'Authorization': `Bearer ${token}` })
+                },
+                ...options
+            };
+            
+            const response = await fetch(`${API_URL}${endpoint}`, config);
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Něco se pokazilo');
+            }
+            
+            return data;
+        }
+        
+        // Load services and check auth
+        async function init() {
+            try {
+                // Load services
+                services = await apiCall('/services');
+                
+                // Check if user is logged in
+                const savedToken = localStorage.getItem('token');
+                if (savedToken) {
+                    token = savedToken;
+                    await loadUserProfile();
+                }
+            } catch (error) {
+                console.error('Init error:', error);
+            }
+            
+            renderServiceCheckboxes();
+        }
+        
+        // Load user profile
+        async function loadUserProfile() {
+            try {
+                currentUser = await apiCall('/profile');
+                showLoggedInState();
+                renderProfile();
+            } catch (error) {
+                console.error('Failed to load profile:', error);
+                localStorage.removeItem('token');
+                token = null;
+            }
+        }
+        
+        // Show/hide forms
+        function showRegisterForm() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
+            renderServiceCheckboxes();
+        }
+        
+        function showLoginForm() {
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+        }
+        
+        function showLoggedInState() {
+            document.querySelectorAll('[data-tab="profile"], [data-tab="search"]').forEach(tab => {
+                tab.classList.remove('hidden');
+            });
+            document.querySelector('[data-tab="login"]').classList.add('hidden');
+            document.getElementById('logout-btn').classList.remove('hidden');
+        }
+        
+        // Login
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorDiv = document.getElementById('login-error');
+            const btn = document.getElementById('login-btn');
+            
+            errorDiv.classList.add('hidden');
+            
+            if (!email || !password) {
+                errorDiv.textContent = 'Prosím vyplň email a heslo';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Přihlašuji...';
+                
+                const response = await apiCall('/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password })
+                });
+                
+                token = response.token;
+                currentUser = response.user;
+                localStorage.setItem('token', token);
+                
+                showLoggedInState();
+                renderProfile();
+                switchTab('profile');
+                
+                document.getElementById('login-email').value = '';
+                document.getElementById('login-password').value = '';
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Přihlásit se';
+            }
+        }
+        
+        // Register
+        async function handleRegister() {
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const city = document.getElementById('register-city').value;
+            const bio = document.getElementById('register-bio').value;
+            const errorDiv = document.getElementById('register-error');
+            const btn = document.getElementById('register-btn');
+            
+            errorDiv.classList.add('hidden');
+            
+            if (!name || !email || !password || !city) {
+                errorDiv.textContent = 'Prosím vyplň všechna povinná pole';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            if (password.length < 6) {
+                errorDiv.textContent = 'Heslo musí mít alespoň 6 znaků';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            const servicesOffered = Array.from(document.querySelectorAll('input[name="register-offer"]:checked'))
+                .map(cb => parseInt(cb.value));
+            const servicesNeeded = Array.from(document.querySelectorAll('input[name="register-need"]:checked'))
+                .map(cb => parseInt(cb.value));
+            
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Registruji...';
+                
+                const response = await apiCall('/register', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        password,
+                        city,
+                        bio,
+                        servicesOffered,
+                        servicesNeeded
+                    })
+                });
+                
+                token = response.token;
+                localStorage.setItem('token', token);
+                
+                await loadUserProfile();
+                showLoggedInState();
+                switchTab('profile');
+                
+                // Reset form
+                document.getElementById('register-name').value = '';
+                document.getElementById('register-email').value = '';
+                document.getElementById('register-password').value = '';
+                document.getElementById('register-city').value = '';
+                document.getElementById('register-bio').value = '';
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Vytvořit profil';
+            }
+        }
+        
+        // Logout
+        function logout() {
+            if (confirm('Chceš se odhlásit?')) {
+                token = null;
+                currentUser = null;
+                localStorage.removeItem('token');
+                
+                document.querySelectorAll('[data-tab="profile"], [data-tab="search"]').forEach(tab => {
+                    tab.classList.add('hidden');
+                });
+                document.querySelector('[data-tab="login"]').classList.remove('hidden');
+                document.getElementById('logout-btn').classList.add('hidden');
+                
+                showLoginForm();
+                switchTab('login');
+            }
+        }
+        
+        // Render service checkboxes
+        function renderServiceCheckboxes() {
+            const offerContainer = document.getElementById('register-services-offer');
+            const needContainer = document.getElementById('register-services-need');
+            
+            if (offerContainer) {
+                offerContainer.innerHTML = '';
+                services.forEach(service => {
+                    const div = document.createElement('div');
+                    div.className = 'checkbox-item';
+                    div.innerHTML = `
+                        <input type="checkbox" id="reg-offer-${service.id}" name="register-offer" value="${service.id}">
+                        <label for="reg-offer-${service.id}">${service.name}</label>
+                    `;
+                    offerContainer.appendChild(div);
+                });
+            }
+            
+            if (needContainer) {
+                needContainer.innerHTML = '';
+                services.forEach(service => {
+                    const div = document.createElement('div');
+                    div.className = 'checkbox-item';
+                    div.innerHTML = `
+                        <input type="checkbox" id="reg-need-${service.id}" name="register-need" value="${service.id}">
+                        <label for="reg-need-${service.id}">${service.name}</label>
+                    `;
+                    needContainer.appendChild(div);
+                });
+            }
+        }
+        
+        // Profile rendering
+        function renderProfile() {
+            if (!currentUser) return;
+            
+            const container = document.getElementById('profile-content');
+            
+            let html = `
+                <div class="profile-card">
+                    <h3>Vítej, ${currentUser.name}! 👋</h3>
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <strong>📍 Lokalita</strong>
+                            ${currentUser.city}
+                        </div>
+                        <div class="info-item">
+                            <strong>📧 Email</strong>
+                            ${currentUser.email}
+                        </div>
+                    </div>
+            `;
+            
+            if (currentUser.bio) {
+                html += `
+                    <div class="info-item" style="margin-top: 15px;">
+                        <strong>💭 O mně</strong>
+                        ${currentUser.bio}
+                    </div>
+                `;
+            }
+            
+            html += `</div>`;
+            
+            // Edit mode
+            if (editMode) {
+                html += `
+                    <div class="edit-mode">
+                        <h3 style="margin-bottom: 15px;">✏️ Úprava služeb</h3>
+                        
+                        <div class="form-group">
+                            <label>✅ Služby, které nabízím</label>
+                            <div class="checkbox-group" id="edit-services-offer"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>🔍 Služby, které hledám</label>
+                            <div class="checkbox-group" id="edit-services-need"></div>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="saveProfileEdit()">💾 Uložit změny</button>
+                        <button class="btn btn-secondary" onclick="cancelProfileEdit()">❌ Zrušit</button>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="profile-card">
+                        <h3>✅ Nabízím tyto služby:</h3>
+                        <div class="services-tags">
+                `;
+                
+                if (currentUser.servicesOffered && currentUser.servicesOffered.length > 0) {
+                    currentUser.servicesOffered.forEach(s => {
+                        html += `<span class="tag offer">${s.name}</span>`;
+                    });
+                } else {
+                    html += `<p style="color: #6c757d;">Zatím žádné služby nenabízíš</p>`;
+                }
+                
+                html += `
+                        </div>
+                    </div>
+                    
+                    <div class="profile-card">
+                        <h3>🔍 Hledám tyto služby:</h3>
+                        <div class="services-tags">
+                `;
+                
+                if (currentUser.servicesNeeded && currentUser.servicesNeeded.length > 0) {
+                    currentUser.servicesNeeded.forEach(s => {
+                        html += `<span class="tag need">${s.name}</span>`;
+                    });
+                } else {
+                    html += `<p style="color: #6c757d;">Zatím nehledáš žádné služby</p>`;
+                }
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (!editMode) {
+                html += `
+                    <div class="action-buttons">
+                        <button class="btn btn-warning" onclick="startProfileEdit()">✏️ Upravit služby</button>
+                        <button class="btn btn-danger" onclick="deleteProfile()">🗑️ Smazat profil</button>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+            
+            if (editMode) {
+                renderEditCheckboxes();
+            }
+        }
+        
+        function renderEditCheckboxes() {
+            const offerContainer = document.getElementById('edit-services-offer');
+            const needContainer = document.getElementById('edit-services-need');
+            
+            if (offerContainer) {
+                offerContainer.innerHTML = '';
+                services.forEach(service => {
+                    const div = document.createElement('div');
+                    div.className = 'checkbox-item';
+                    const checked = currentUser.servicesOffered.some(s => s.id === service.id) ? 'checked' : '';
+                    div.innerHTML = `
+                        <input type="checkbox" id="edit-offer-${service.id}" name="edit-offer" value="${service.id}" ${checked}>
+                        <label for="edit-offer-${service.id}">${service.name}</label>
+                    `;
+                    offerContainer.appendChild(div);
+                });
+            }
+            
+            if (needContainer) {
+                needContainer.innerHTML = '';
+                services.forEach(service => {
+                    const div = document.createElement('div');
+                    div.className = 'checkbox-item';
+                    const checked = currentUser.servicesNeeded.some(s => s.id === service.id) ? 'checked' : '';
+                    div.innerHTML = `
+                        <input type="checkbox" id="edit-need-${service.id}" name="edit-need" value="${service.id}" ${checked}>
+                        <label for="edit-need-${service.id}">${service.name}</label>
+                    `;
+                    needContainer.appendChild(div);
+                });
+            }
+        }
+        
+        function startProfileEdit() {
+            editMode = true;
+            renderProfile();
+        }
+        
+        function cancelProfileEdit() {
+            editMode = false;
+            renderProfile();
+        }
+        
+        async function saveProfileEdit() {
+            const servicesOffered = Array.from(document.querySelectorAll('input[name="edit-offer"]:checked'))
+                .map(cb => parseInt(cb.value));
+            const servicesNeeded = Array.from(document.querySelectorAll('input[name="edit-need"]:checked'))
+                .map(cb => parseInt(cb.value));
+            
+            try {
+                await apiCall('/profile/services', {
+                    method: 'PUT',
+                    body: JSON.stringify({ servicesOffered, servicesNeeded })
+                });
+                
+                await loadUserProfile();
+                editMode = false;
+                renderProfile();
+                
+                alert('✅ Služby byly úspěšně aktualizovány!');
+            } catch (error) {
+                alert('Chyba: ' + error.message);
+            }
+        }
+        
+        async function deleteProfile() {
+            if (confirm('⚠️ Opravdu chceš smazat svůj profil? Tato akce je nevratná!')) {
+                try {
+                    await apiCall('/profile', { method: 'DELETE' });
+                    
+                    logout();
+                    alert('✅ Profil byl smazán.');
+                } catch (error) {
+                    alert('Chyba: ' + error.message);
+                }
+            }
+        }
+        
+        // Search
+        async function renderSearch() {
+            const container = document.getElementById('search-content');
+            
+            if (!currentUser) {
+                container.innerHTML = '<p>Nejdříve se přihlaš</p>';
+                return;
+            }
+            
+            container.innerHTML = '<div class="loading"><div class="spinner"></div>Hledám ženy ve tvém městě...</div>';
+            
+            try {
+                const matches = await apiCall('/search');
+                
+                let html = `<h2 style="margin-bottom: 20px; color: #495057;">Ženy ve tvém městě (${currentUser.city})</h2>`;
+                
+                if (matches.length > 0) {
+                    html += '<div class="users-grid">';
+                    matches.forEach(user => {
+                        html += `
+                            <div class="user-card">
+                                <h4>${user.name}</h4>
+                                <div class="location">📍 ${user.city}</div>
+                        `;
+                        
+                        if (user.bio) {
+                            html += `<p style="font-size: 0.9em; color: #6c757d; margin-bottom: 15px;">${user.bio}</p>`;
+                        }
+                        
+                        html += `
+                                <strong style="font-size: 0.9em; color: #495057;">Nabízí služby, které hledáš:</strong>
+                                <div class="services-tags">
+                        `;
+                        
+                        user.servicesOffered.forEach(s => {
+                            html += `<span class="tag offer">${s.name}</span>`;
+                        });
+                        
+                        html += `
+                                </div>
+                                <button class="btn btn-primary btn-small" style="width: 100%; margin-top: 15px;" onclick="showMessageBox(${user.id})">
+                                    💬 Napsat zprávu
+                                </button>
+                                <div class="message-box" id="msg-${user.id}">
+                                    <textarea id="msg-text-${user.id}" rows="3" placeholder="Napiš ${user.name} zprávu..."></textarea>
+                                    <button class="btn btn-primary btn-small" onclick="sendMessage(${user.id})">Odeslat</button>
+                                    <button class="btn btn-secondary btn-small" onclick="hideMessageBox(${user.id})">Zrušit</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                } else {
+                    html += `
+                        <div class="alert alert-info">
+                            <strong>🔍 Zatím nejsou k dispozici žádné shody</strong>
+                            <p style="margin-top: 10px;">V tvém městě zatím nejsou ženy, které nabízejí služby, o které máš zájem. Zkus to znovu později nebo uprav své preference!</p>
+                        </div>
+                    `;
+                }
+                
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="alert alert-danger">
+                        <strong>Chyba při vyhledávání</strong>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function showMessageBox(userId) {
+            document.getElementById('msg-' + userId).classList.add('active');
+        }
+        
+        function hideMessageBox(userId) {
+            document.getElementById('msg-' + userId).classList.remove('active');
+        }
+        
+        async function sendMessage(userId) {
+            const message = document.getElementById('msg-text-' + userId).value;
+            
+            if (!message.trim()) {
+                alert('Napiš nějakou zprávu');
+                return;
+            }
+            
+            try {
+                await apiCall('/messages', {
+                    method: 'POST',
+                    body: JSON.stringify({ toUserId: userId, message })
+                });
+                
+                alert(`Zpráva odeslána!\n\nNa váš email byl odeslán návod s bezpečnostními pokyny:\n\n✓ Setkejte se vždy na veřejném místě\n✓ Řekněte někomu blízkému, kde budete\n✓ Mějte nabitý telefon\n✓ Důvěřujte svému instinktu`);
+                
+                document.getElementById('msg-text-' + userId).value = '';
+                hideMessageBox(userId);
+            } catch (error) {
+                alert('Chyba: ' + error.message);
+            }
+        }
+        
+        // Tabs
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+        }
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            if (tabName === 'search') {
+                renderSearch();
+            }
+        }
+        
+        // Init
+        document.addEventListener('DOMContentLoaded', function() {
+            setupTabs();
+            init();
+        });
+    </script>
+</body>
+</html>
