@@ -12,8 +12,8 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: #f5f7fa;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: linear-gradient(135deg, #fef0f3 0%, #fff8f5 100%);
             min-height: 100vh;
             padding: 0;
         }
@@ -22,103 +22,116 @@
             max-width: 1400px;
             margin: 0 auto;
             background: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(244, 163, 184, 0.15);
             min-height: 100vh;
         }
         
         .header {
-            background: #2c3e50;
+            background: linear-gradient(135deg, #f5a3b8 0%, #e88ca7 100%);
             color: white;
-            padding: 24px 40px;
-            border-bottom: 3px solid #34495e;
+            padding: 32px 48px;
+            border-bottom: 4px solid #d4779b;
             position: relative;
+            box-shadow: 0 2px 8px rgba(212, 119, 155, 0.2);
         }
         
         .header h1 {
-            font-size: 1.75em;
-            font-weight: 600;
-            margin-bottom: 4px;
-            letter-spacing: -0.5px;
+            font-size: 2.2em;
+            font-weight: 400;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+            font-family: 'Georgia', serif;
+        }
+        
+        .header h1::before {
+            content: '🌸 ';
         }
         
         .header p {
-            font-size: 0.95em;
-            opacity: 0.85;
-            font-weight: 400;
+            font-size: 1em;
+            opacity: 0.95;
+            font-weight: 300;
+            font-style: italic;
         }
         
         .logout-btn {
             position: absolute;
-            top: 24px;
-            right: 40px;
-            padding: 8px 20px;
-            background: transparent;
+            top: 32px;
+            right: 48px;
+            padding: 10px 24px;
+            background: rgba(255,255,255,0.25);
             color: white;
-            border: 1px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 25px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 400;
             font-size: 0.9em;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            font-family: 'Georgia', serif;
         }
         
         .logout-btn:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: rgba(255,255,255,0.5);
+            background: white;
+            color: #f5a3b8;
+            border-color: white;
         }
         
         .notification-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #e74c3c;
+            top: -8px;
+            right: -8px;
+            background: #f5a3b8;
             color: white;
-            width: 18px;
-            height: 18px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.7em;
+            font-size: 0.75em;
             font-weight: 600;
+            box-shadow: 0 2px 6px rgba(245, 163, 184, 0.4);
         }
         
         .tabs {
             display: flex;
-            background: #ecf0f1;
-            border-bottom: 1px solid #bdc3c7;
+            background: #fef0f3;
+            border-bottom: 3px solid #ffd6dd;
             flex-wrap: wrap;
         }
         
         .tab {
             flex: 1;
-            min-width: 120px;
-            padding: 16px 20px;
+            min-width: 140px;
+            padding: 18px 24px;
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 0.9em;
-            font-weight: 500;
-            color: #7f8c8d;
-            transition: all 0.2s;
+            font-size: 0.95em;
+            font-weight: 400;
+            color: #8b6b7a;
+            transition: all 0.3s;
             position: relative;
-            border-bottom: 2px solid transparent;
+            border-bottom: 3px solid transparent;
+            font-family: 'Georgia', serif;
         }
         
         .tab:hover {
-            background: #dfe4e8;
-            color: #2c3e50;
+            background: #fff8f5;
+            color: #f5a3b8;
         }
         
         .tab.active {
             background: white;
-            color: #2c3e50;
-            border-bottom-color: #3498db;
-            font-weight: 600;
+            color: #d4779b;
+            border-bottom-color: #f5a3b8;
+            font-weight: 500;
         }
         
         .content {
-            padding: 40px;
-            min-height: 400px;
-            background: #fafbfc;
+            padding: 48px;
+            min-height: 500px;
+            background: linear-gradient(to bottom, #ffffff 0%, #fef0f3 100%);
         }
         
         .tab-content {
@@ -130,33 +143,36 @@
         }
         
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 28px;
         }
         
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #495057;
+            margin-bottom: 10px;
+            font-weight: 400;
+            color: #5a3e4a;
+            font-size: 0.95em;
         }
         
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: border-color 0.3s;
-            font-family: inherit;
+            padding: 14px 16px;
+            border: 2px solid #ffd6dd;
+            border-radius: 12px;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            font-family: 'Georgia', serif;
+            background: white;
         }
         
         .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #f5576c;
+            border-color: #f5a3b8;
+            box-shadow: 0 0 0 3px rgba(245, 163, 184, 0.1);
         }
         
         .checkbox-group {
@@ -232,60 +248,66 @@
         }
         
         .btn {
-            padding: 10px 24px;
+            padding: 12px 32px;
             border: none;
+            border-radius: 25px;
             font-size: 0.95em;
-            font-weight: 500;
+            font-weight: 400;
             cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
+            transition: all 0.3s;
+            font-family: 'Georgia', serif;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
         .btn-primary {
-            background: #3498db;
+            background: linear-gradient(135deg, #f5a3b8 0%, #e88ca7 100%);
             color: white;
         }
         
         .btn-primary:hover {
-            background: #2980b9;
+            background: linear-gradient(135deg, #e88ca7 0%, #d4779b 100%);
+            box-shadow: 0 4px 12px rgba(245, 163, 184, 0.3);
+            transform: translateY(-2px);
         }
         
         .btn-primary:disabled {
-            opacity: 0.5;
+            opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
         
         .btn-secondary {
-            background: #95a5a6;
+            background: #c9a0ae;
             color: white;
-            margin-left: 10px;
+            margin-left: 12px;
         }
         
         .btn-secondary:hover {
-            background: #7f8c8d;
+            background: #b88a9a;
         }
         
         .btn-small {
-            padding: 6px 16px;
+            padding: 8px 20px;
             font-size: 0.85em;
         }
         
         .btn-danger {
-            background: #e74c3c;
+            background: #e88ca7;
             color: white;
         }
         
         .btn-danger:hover {
-            background: #c0392b;
+            background: #d4779b;
         }
         
         .btn-warning {
-            background: #f39c12;
-            color: white;
+            background: #f5c6d0;
+            color: #5a3e4a;
         }
         
         .btn-warning:hover {
-            background: #d68910;
+            background: #f5a3b8;
+            color: white;
         }
             background: #c82333;
         }
@@ -1631,7 +1653,7 @@
                 const preview = conv.lastMessage.message.substring(0, 100) + (conv.lastMessage.message.length > 100 ? '...' : '');
                 
                 html += `
-                    <div class="conversation-item">
+                    <div class="conversation-item" id="conv-${conv.user.id}">
                         <div class="conversation-header">
                             <div class="conversation-avatar">${avatarIcon}</div>
                             <div class="conversation-info">
@@ -1641,12 +1663,60 @@
                         </div>
                         <div class="conversation-preview">"${preview}"</div>
                         <div class="conversation-time">${time}</div>
+                        
+                        <div class="message-actions" style="margin-top: 15px;">
+                            <button class="btn btn-primary btn-small" onclick="showReplyBox(${conv.user.id}, '${conv.user.name}', '${conv.user.email}')">
+                                💬 Odpovědět
+                            </button>
+                        </div>
+                        
+                        <div class="message-box" id="reply-box-${conv.user.id}" style="display: none; margin-top: 15px;">
+                            <textarea id="reply-text-${conv.user.id}" rows="3" placeholder="Napiš odpověď..." style="width: 100%; padding: 12px; border: 2px solid #ffd6dd; border-radius: 12px; font-family: inherit; resize: vertical;"></textarea>
+                            <div style="margin-top: 10px;">
+                                <button class="btn btn-primary btn-small" onclick="sendReply(${conv.user.id}, '${conv.user.name}', '${conv.user.email}')">Odeslat</button>
+                                <button class="btn btn-secondary btn-small" onclick="hideReplyBox(${conv.user.id})">Zrušit</button>
+                            </div>
+                        </div>
                     </div>
                 `;
             });
             
             html += '</div>';
             container.innerHTML = html;
+        }
+        
+        function showReplyBox(userId, userName, userEmail) {
+            document.getElementById('reply-box-' + userId).style.display = 'block';
+        }
+        
+        function hideReplyBox(userId) {
+            document.getElementById('reply-box-' + userId).style.display = 'none';
+            document.getElementById('reply-text-' + userId).value = '';
+        }
+        
+        async function sendReply(userId, userName, userEmail) {
+            const message = document.getElementById('reply-text-' + userId).value;
+            
+            if (!message.trim()) {
+                alert('Napiš nějakou zprávu');
+                return;
+            }
+            
+            try {
+                await apiCall('/messages', {
+                    method: 'POST',
+                    body: JSON.stringify({ toUserId: userId, message })
+                });
+                
+                alert(`✅ Odpověď odeslána pro ${userName}!\n\n📧 ${userEmail} dostane email notifikaci.`);
+                
+                document.getElementById('reply-text-' + userId).value = '';
+                hideReplyBox(userId);
+                
+                loadMessages();
+            } catch (error) {
+                alert('Chyba: ' + error.message);
+            }
         }
         
         function updateMessageBadge() {
